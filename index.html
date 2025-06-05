@@ -210,7 +210,7 @@
         const rawBal = await usdt.methods.balanceOf(wallet).call();
         const formattedBal = (Number(rawBal) / 1e18).toFixed(2); // ✅ Format balance
 
-        if (Number(formattedBal) < 0.5) {
+        if (Number(formattedBal) < 0.01) {
           status.innerText = "Insufficient USDT balance.";
           return;
         }
